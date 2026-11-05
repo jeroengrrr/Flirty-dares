@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f5f5f7">
+<meta name="apple-mobile-web-app-title" content="Flirty dares">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Flirty dares</title>
+<style>
+:root{--bg:#f5f5f7;--text:#1d1d1f;--muted:#6e6e73;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--text:#f5f5f7;--muted:#a1a1a6}}
+:root[data-theme="dark"]{--bg:#000;--text:#f5f5f7;--muted:#a1a1a6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:36px 20px 40px}
+header{text-align:center;margin-bottom:26px}
+.eyebrow{margin:0 0 6px;font-size:.95rem;font-weight:600;color:var(--c)}
+h1{margin:0;font-size:clamp(2.4rem,11vw,3.4rem);line-height:1.05;font-weight:700;letter-spacing:-.03em}
+.progress{display:flex;gap:6px;margin:0 auto 20px;max-width:200px}
+.progress i{flex:1;height:4px;border-radius:2px;transition:opacity .4s}
+.tile{position:relative;border-radius:28px;padding:26px 24px 22px;min-height:380px;display:flex;flex-direction:column;color:#fff;background:linear-gradient(155deg,color-mix(in srgb,var(--c) 78%,#fff) -30%,var(--c) 55%,color-mix(in srgb,var(--c) 80%,#000) 130%);box-shadow:0 18px 40px -18px var(--c);transition:background .5s,box-shadow .5s}
+.label{font-size:.85rem;font-weight:600;letter-spacing:.02em;opacity:.85}
+.value{flex:1;display:flex;align-items:center;font-size:clamp(1.55rem,7vw,2.1rem);line-height:1.18;font-weight:700;letter-spacing:-.02em;word-break:break-word;padding:18px 0}
+.value.empty{font-weight:600;opacity:.6}
+.value.pop span{display:block;animation:pop .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.left{font-size:.9rem;font-weight:500;opacity:.85}
+button{font:inherit;cursor:pointer;border:0}
+.pill{font-weight:600;font-size:1.02rem;border-radius:980px;padding:12px 26px;background:#fff;color:var(--c);transition:transform .15s,opacity .2s}
+.pill:active{transform:scale(.96)}
+.pill:disabled{opacity:.45}
+.next{display:block;width:100%;margin-top:14px;padding:16px;font-size:1.05rem;font-weight:600;border-radius:980px;background:var(--c);color:#fff;animation:pop .45s cubic-bezier(.2,.8,.2,1)}
+.next[hidden]{display:none}
+.links{display:flex;justify-content:space-between;margin-top:22px;padding:0 6px}
+.link{background:none;padding:8px 2px;font-size:.95rem;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.link.off{visibility:hidden}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1>Flirty dares</h1>
+</header>
+<div class="progress" id="progress"></div>
+<section class="tile" id="tile">
+  <div class="label" id="label"></div>
+  <div class="value empty" id="value"><span>Tik op Trek</span></div>
+  <div class="row"><span class="left" id="left"></span><button class="pill" id="draw">Trek</button></div>
+</section>
+<button class="next" id="next" hidden></button>
+<nav class="links">
+  <button class="link" id="back">Ga een ronde terug</button>
+  <button class="link" id="skip">Ronde overslaan</button>
+</nav>
+</main>
+<script>
+const LISTS = [
+  { naam: "Opwarmen", kleur: "#ef6b6b", items: [
+    "Geef een oprecht compliment",
+    "Fluister in het oor wat je het leukst aan diegene vindt",
+    "Dans met lang oogcontact",
+    "Dans heel dicht tegen elkaar",
+    "Geef een nek- of rugmassage",
+    "Streel met één vinger langzaam over de rug of zij"
+  ]},
+  { naam: "Dichterbij", kleur: "#d32f2f", items: [
+    "Dans terwijl je de heupen of rug streelt",
+    "Dans met je armen om de nek, lichamen tegen elkaar",
+    "Dans met je rug tegen de borst, terwijl diegene zijn of haar handen over jouw lijf laat gaan",
+    "Zoen op een andere plek dan de mond",
+    "Streel zachtjes langs de nek",
+    "Kus in de nek of op de schouder"
+  ]},
+  { naam: "Spannend", kleur: "#8f1111", items: [
+    "Fluister een stoute gedachte in het oor",
+    "Laat je sandwichen, geef hun handen de vrije loop",
+    "Zoen bijna, maar blijf even hangen voor de lippen",
+    "Zoen langzaam de hals of nek",
+    "Zoen met hem of haar",
+    "Zoen om de beurt met elkaar"
+  ]}
+];
+
+// Alleen in het geheugen: bij verversen van de pagina begint alles opnieuw.
+const pools = LISTS.map(l => l.items.slice());
+const last = LISTS.map(() => null);
+let current = 0;
+
+const $ = id => document.getElementById(id);
+const tile = $("tile"), valueEl = $("value"), nextBtn = $("next");
+const bars = LISTS.map(l => { const b = document.createElement("i"); b.style.background = l.kleur; $("progress").appendChild(b); return b; });
+
+function setValue(text, animate) {
+  valueEl.innerHTML = "";
+  const s = document.createElement("span");
+  s.textContent = text;
+  valueEl.appendChild(s);
+  valueEl.className = "value" + (last[current] === null ? " empty" : "") + (animate ? " pop" : "");
+}
+
+function render(animate) {
+  const l = LISTS[current];
+  const left = pools[current].length;
+  const done = left === 0;
+  const hasNext = current < LISTS.length - 1;
+  document.documentElement.style.setProperty("--c", l.kleur);
+  tile.style.setProperty("--c", l.kleur);
+  $("eyebrow").textContent = "Ronde " + (current + 1) + " van " + LISTS.length;
+  $("label").textContent = "Ronde " + (current + 1) + " · " + l.naam;
+  bars.forEach((b, i) => { b.style.opacity = i <= current ? 1 : .22; });
+  setValue(last[current] === null ? "Tik op Trek" : last[current], animate);
+  $("left").textContent = done ? "Alles gehad" : left + " over";
+  $("draw").disabled = done;
+  nextBtn.hidden = !(done && hasNext);
+  if (!nextBtn.hidden) {
+    nextBtn.style.setProperty("--c", LISTS[current + 1].kleur);
+    nextBtn.textContent = "Door naar ronde " + (current + 2) + " →";
+  }
+  $("back").classList.toggle("off", current === 0);
+  $("skip").classList.toggle("off", !hasNext || (done && hasNext));
+}
+
+function go(n) {
+  pools[n] = LISTS[n].items.slice();
+  last[n] = null;
+  current = n;
+  render(false);
+  window.scrollTo(0, 0);
+}
+
+$("draw").addEventListener("click", () => {
+  const pool = pools[current];
+  if (!pool.length) return;
+  last[current] = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+  render(true);
+});
+nextBtn.addEventListener("click", () => go(current + 1));
+$("skip").addEventListener("click", () => go(current + 1));
+$("back").addEventListener("click", () => go(current - 1));
+render(false);
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {})); }
+</script>
+</body>
+</html>
